@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaskEarn - आसान टास्क और रियल कैश</title>
+    <title>TaskEarn - लॉगिन करके पैसे कमाएं</title>
     <style>
         :root {
             --primary: #2ecc71;
@@ -15,9 +15,22 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
         body { background-color: var(--bg); color: var(--text); padding-bottom: 40px; }
+        
+        /* Auth Screens (Login / Sign Up) */
+        .auth-container { max-width: 400px; margin: 60px auto; padding: 0 20px; display: block; }
+        .auth-card { background: var(--card-bg); border: 1px solid var(--border); padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; }
+        .auth-card h2 { margin-bottom: 20px; color: var(--primary); }
+        .auth-toggle { font-size: 14px; margin-top: 15px; color: var(--secondary); cursor: pointer; text-decoration: underline; }
+
+        /* Main Dashboard (Hidden by Default) */
+        #mainApp { display: none; }
         header { background: var(--card-bg); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .logo { font-size: 22px; font-weight: bold; color: var(--primary); }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .logout-btn { background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; }
         .wallet-badge { background: rgba(46, 204, 113, 0.1); color: var(--primary); padding: 8px 15px; border-radius: 20px; font-weight: bold; }
+        
+        /* App Content */
         .container { max-width: 500px; margin: 20px auto; padding: 0 15px; }
         .card { background: var(--card-bg); border: 1px solid var(--border); padding: 20px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); text-align: center; }
         .task-card { display: flex; justify-content: space-between; align-items: center; text-align: left; cursor: pointer; transition: transform 0.2s; }
@@ -25,73 +38,102 @@
         .task-info h3 { font-size: 16px; margin-bottom: 3px; }
         .task-info p { font-size: 13px; color: #7f8c8d; }
         .reward-tag { background: #f1f9f5; color: var(--primary); padding: 5px 10px; border-radius: 5px; font-weight: bold; font-size: 13px; min-width: 85px; text-align: center; }
+        
+        /* Buttons & Inputs */
         .btn { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
         .btn-withdraw { background: var(--secondary); margin-top: 15px; }
-        
-        /* Modals & Popups */
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; text-align: center; }
+        .info-sub { font-size: 12px; color: #7f8c8d; margin-top: -5px; margin-bottom: 10px; }
+
+        /* Modals / Popups */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
         .modal-content { background: var(--card-bg); padding: 25px; border-radius: 15px; width: 100%; max-width: 400px; text-align: center; position: relative; }
         .close-btn { position: absolute; top: 12px; right: 15px; font-size: 22px; cursor: pointer; color: #95a5a6; }
-        input, select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid var(--border); border-radius: 6px; font-size: 16px; text-align: center; }
-        .info-sub { font-size: 12px; color: #7f8c8d; margin-top: -5px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo">🪙 TaskEarn</div>
-        <div class="wallet-badge">🪙 <span id="balance">0</span> Coins</div>
-    </header>
-
-    <div class="container">
-        <!-- डैशबोर्ड -->
-        <div class="card">
-            <h2>आपका टोटल बैलेंस</h2>
-            <h1 style="color: var(--primary); font-size: 36px; margin: 10px 0;">🪙 <span id="mainCoins">0</span></h1>
-            <p class="info-sub">(1000 कॉइन्स = ₹10 रियल कैश)</p>
-            <button class="btn btn-withdraw" onclick="openModal('withdrawModal')">💰 पैसे निकालें (Withdraw)</button>
-        </div>
-
-        <h2 style="font-size: 18px; margin: 15px 5px 10px;">🔥 आसान टास्क बोर्ड</h2>
-
-        <!-- लकी स्पिन टास्क -->
-        <div class="card task-card" onclick="openModal('spinModal')">
-            <div class="task-info">
-                <h3>🎡 लकी स्पिन (Lucky Spin)</h3>
-                <p>पहिया घुमाएं और जैकपॉट जीतें</p>
-            </div>
-            <div class="reward-tag">Up to 50</div>
-        </div>
-
-        <!-- मैथ क्विज़ टास्क -->
-        <div class="card task-card" onclick="openQuiz()">
-            <div class="task-info">
-                <h3>🧮 मैथ क्विज़ (Math Quiz)</h3>
-                <p>आसान सवालों के सही जवाब दें</p>
-            </div>
-            <div class="reward-tag">+20 Coins</div>
-        </div>
-
-        <!-- स्क्रैच कार्ड टास्क -->
-        <div class="card task-card" onclick="openScratch()">
-            <div class="task-info">
-                <h3>🎁 स्क्रैच कार्ड (Scratch & Win)</h3>
-                <p>कार्ड स्क्रैच करके इनाम पाएं</p>
-            </div>
-            <div class="reward-tag">Up to 40</div>
-        </div>
-
-        <!-- वेबसाइट विज़िट टास्क -->
-        <div class="card task-card" onclick="startAdTask()">
-            <div class="task-info">
-                <h3>🌐 वेबसाइट विज़िट (Visit Link)</h3>
-                <p>15 सेकंड विज्ञापन देखें और कमाएं</p>
-            </div>
-            <div class="reward-tag">+30 Coins</div>
+    <!-- ================= 1. LOGIN SCREEN ================= -->
+    <div id="loginScreen" class="auth-container">
+        <div class="auth-card">
+            <h2>🪙 TaskEarn लॉगिन</h2>
+            <p style="color: #7f8c8d; margin-bottom: 15px;">पैसे कमाने के लिए अकाउंट में लॉगिन करें</p>
+            <input type="email" id="loginEmail" placeholder="अपना ईमेल दर्ज करें">
+            <input type="password" id="loginPassword" placeholder="अपना पासवर्ड दर्ज करें">
+            <button class="btn" onclick="handleLogin()">लॉगिन करें</button>
+            <p class="auth-toggle" onclick="showScreen('signUpScreen')">नया अकाउंट बनाएं (Sign Up)</p>
         </div>
     </div>
 
-    <!-- SPIN MODAL -->
+    <!-- ================= 2. SIGN UP SCREEN ================= -->
+    <div id="signUpScreen" class="auth-container" style="display: none;">
+        <div class="auth-card">
+            <h2>🎁 नया अकाउंट बनाएं</h2>
+            <p style="color: #7f8c8d; margin-bottom: 15px;">रजिस्ट्रेशन बिल्कुल मुफ्त है</p>
+            <input type="text" id="signUpName" placeholder="आपका नाम लिखें">
+            <input type="email" id="signUpEmail" placeholder="ईमेल आईडी दर्ज करें">
+            <input type="password" id="signUpPassword" placeholder="एक मजबूत पासवर्ड बनाएं">
+            <button class="btn" onclick="handleSignUp()">अकाउंट बनाएं</button>
+            <p class="auth-toggle" onclick="showScreen('loginScreen')">पहले से अकाउंट है? लॉगिन करें</p>
+        </div>
+    </div>
+
+    <!-- ================= 3. MAIN APP DASHBOARD ================= -->
+    <div id="mainApp">
+        <header>
+            <div class="logo">🪙 TaskEarn</div>
+            <div class="user-info">
+                <div class="wallet-badge">🪙 <span id="balance">0</span> Coins</div>
+                <button class="logout-btn" onclick="handleLogout()">Logout</button>
+            </div>
+        </header>
+
+        <div class="container">
+            <div class="card">
+                <h3 style="font-weight: normal;">नमस्ते, <span id="welcomeName" style="color: var(--secondary); font-weight: bold;">यूज़र</span>! 👋</h3>
+                <h2 style="margin-top: 15px;">टोटल बैलेंस</h2>
+                <h1 style="color: var(--primary); font-size: 36px; margin: 5px 0;">🪙 <span id="mainCoins">0</span></h1>
+                <p class="info-sub">(1000 कॉइन्स = ₹10 रियल कैश)</p>
+                <button class="btn btn-withdraw" onclick="openModal('withdrawModal')">💰 पैसे निकालें (Withdraw)</button>
+            </div>
+
+            <h2 style="font-size: 18px; margin: 15px 5px 10px;">🔥 आसान टास्क बोर्ड</h2>
+
+            <div class="card task-card" onclick="openModal('spinModal')">
+                <div class="task-info">
+                    <h3>🎡 लकी स्पिन (Lucky Spin)</h3>
+                    <p>पहिया घुमाएं और जैकपॉट जीतें</p>
+                </div>
+                <div class="reward-tag">Up to 50</div>
+            </div>
+
+            <div class="card task-card" onclick="openQuiz()">
+                <div class="task-info">
+                    <h3>🧮 मैथ क्विज़ (Math Quiz)</h3>
+                    <p>आसान सवालों के सही जवाब दें</p>
+                </div>
+                <div class="reward-tag">+20 Coins</div>
+            </div>
+
+            <div class="card task-card" onclick="openScratch()">
+                <div class="task-info">
+                    <h3>🎁 स्क्रैच कार्ड (Scratch & Win)</h3>
+                    <p>कार्ड स्क्रैच करके इनाम पाएं</p>
+                </div>
+                <div class="reward-tag">Up to 40</div>
+            </div>
+
+            <div class="card task-card" onclick="startAdTask()">
+                <div class="task-info">
+                    <h3>🌐 वेबसाइट विज़िट (Visit Link)</h3>
+                    <p>15 सेकंड विज्ञापन देखें और कमाएं</p>
+                </div>
+                <div class="reward-tag">+30 Coins</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP MODALS (SPIN, QUIZ, SCRATCH, WITHDRAW) -->
     <div id="spinModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('spinModal')">&times;</span>
@@ -101,7 +143,6 @@
         </div>
     </div>
 
-    <!-- QUIZ MODAL -->
     <div id="quizModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('quizModal')">&times;</span>
@@ -112,7 +153,6 @@
         </div>
     </div>
 
-    <!-- SCRATCH MODAL -->
     <div id="scratchModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('scratchModal')">&times;</span>
@@ -123,95 +163,19 @@
         </div>
     </div>
 
-    <!-- WITHDRAW MODAL -->
     <div id="withdrawModal" class="modal">
         <div class="modal-content" style="text-align: left;">
             <span class="close-btn" onclick="closeModal('withdrawModal')">&times;</span>
             <h3 style="text-align: center; margin-bottom: 15px;">💸 रिडीम पेमेंट</h3>
-            
             <label><b>तरीका चुनें:</b></label>
             <select id="payMethod">
                 <option value="Paytm">Paytm Wallet</option>
                 <option value="UPI">PhonePe / GooglePay (UPI)</option>
             </select>
-
-            <label><b>नंबर / UPI ID दर्ज करें:</b></label>
             <input type="text" id="payDetails" placeholder="उदा: 9876543210 या name@apl">
-
-            <label><b>कॉइन्स की संख्या:</b></label>
             <input type="number" id="payAmount" placeholder="कम से कम 1000">
             <p class="info-sub">*मिनिमम विथड्रॉल ₹10 (1000 कॉइन्स) है।</p>
-
             <button class="btn" onclick="runWithdraw()">रिक्वेस्ट भेजें</button>
         </div>
     </div>
-
-    <script>
-        // वैश्विक वेरिएबल्स और डेटा लोडिंग
-        let coins = parseInt(localStorage.getItem('userCoins')) || 0;
-        let correctAnswer = 0;
-        
-        // विज्ञापन का डायरेक्ट लिंक (यहाँ अपनी पसंद का विज्ञापन लिंक डालें)
-        const MY_AD_LINK = "https://example.com"; 
-
-        function updateUI() {
-            document.getElementById('balance').innerText = coins;
-            document.getElementById('mainCoins').innerText = coins;
-            localStorage.setItem('userCoins', coins);
-        }
-        updateUI();
-
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        // 1. लकी स्पिन
-        function runSpin() {
-            let btn = document.getElementById('spinBtn');
-            btn.disabled = true;
-            btn.innerText = "घुम रहा है...";
-            
-            // बैकग्राउंड में विज्ञापन खोलना (कमाई के लिए)
-            window.open(MY_AD_LINK, '_blank');
-
-            setTimeout(() => {
-                let win = Math.floor(Math.random() * 40) + 10;
-                coins += win;
-                updateUI();
-                alert(`🎉 बधाई हो! आपको स्पिन से ${win} कॉइन्स मिले।`);
-                btn.disabled = false;
-                btn.innerText = "🎡 पहिया घुमाएं";
-                closeModal('spinModal');
-            }, 2000);
-        }
-
-        // 2. मैथ क्विज़
-        function openQuiz() {
-            let n1 = Math.floor(Math.random() * 15) + 1;
-            let n2 = Math.floor(Math.random() * 15) + 1;
-            correctAnswer = n1 + n2;
-            document.getElementById('quizQuestion').innerText = `${n1} + ${n2} = ?`;
-            document.getElementById('quizAnswer').value = '';
-            openModal('quizModal');
-        }
-
-        function checkQuiz() {
-            let ans = parseInt(document.getElementById('quizAnswer').value);
-            if (ans === correctAnswer) {
-                coins += 20;
-                updateUI();
-                alert("✅ सही जवाब! आपको 20 कॉइन्स मिले।");
-                window.open(MY_AD_LINK, '_blank'); // विज्ञापन खोलें
-                closeModal('quizModal');
-            } else {
-                alert("❌ गलत जवाब! दोबारा कोशिश करें।");
-            }
-        }
-
-        // 3. स्क्रैच कार्ड
-        function openScratch() {
-            document.getElementById('scratchArea').innerText = "यहाँ क्लिक करके स्क्रैच करें";
-            document.getElementById('scratchArea').style.background = "#bdc3c7";
-            openModal('scratchModal');
-        }
-
 
