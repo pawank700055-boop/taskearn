@@ -180,7 +180,14 @@
     </div>
 
     <script>
-        let coins = 0;
+       if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(registration => {
+        console.log('Service Worker registered!');
+      });
+  });
+} let coins = 0;
         let correctAnswer = 0;
         const MY_AD_LINK = ""; 
 
