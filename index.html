@@ -16,36 +16,35 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
         body { background-color: var(--bg); color: var(--text); padding-bottom: 40px; }
         
-        /* Auth Screens (Login / Sign Up) */
-        .auth-container { max-width: 400px; margin: 60px auto; padding: 0 20px; display: block; }
+        /* Auth Screens */
+        .auth-container { max-width: 400px; margin: 50px auto; padding: 0 20px; }
         .auth-card { background: var(--card-bg); border: 1px solid var(--border); padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; }
         .auth-card h2 { margin-bottom: 20px; color: var(--primary); }
-        .auth-toggle { font-size: 14px; margin-top: 15px; color: var(--secondary); cursor: pointer; text-decoration: underline; }
+        .auth-toggle { font-size: 14px; margin-top: 15px; color: var(--secondary); cursor: pointer; text-decoration: underline; display: inline-block; }
 
-        /* Main Dashboard (Hidden by Default) */
+        /* Main App */
         #mainApp { display: none; }
-        header { background: var(--card-bg); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        header { background: var(--card-bg); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
         .logo { font-size: 22px; font-weight: bold; color: var(--primary); }
         .user-info { display: flex; align-items: center; gap: 15px; }
-        .logout-btn { background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; }
+        .logout-btn { background: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: bold; }
         .wallet-badge { background: rgba(46, 204, 113, 0.1); color: var(--primary); padding: 8px 15px; border-radius: 20px; font-weight: bold; }
         
-        /* App Content */
+        /* Dashboard & Cards */
         .container { max-width: 500px; margin: 20px auto; padding: 0 15px; }
-        .card { background: var(--card-bg); border: 1px solid var(--border); padding: 20px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); text-align: center; }
-        .task-card { display: flex; justify-content: space-between; align-items: center; text-align: left; cursor: pointer; transition: transform 0.2s; }
-        .task-card:hover { transform: translateY(-2px); }
+        .card { background: var(--card-bg); border: 1px solid var(--border); padding: 20px; border-radius: 12px; margin-bottom: 15px; text-align: center; }
+        .task-card { display: flex; justify-content: space-between; align-items: center; text-align: left; cursor: pointer; }
         .task-info h3 { font-size: 16px; margin-bottom: 3px; }
         .task-info p { font-size: 13px; color: #7f8c8d; }
         .reward-tag { background: #f1f9f5; color: var(--primary); padding: 5px 10px; border-radius: 5px; font-weight: bold; font-size: 13px; min-width: 85px; text-align: center; }
         
-        /* Buttons & Inputs */
+        /* Inputs & Buttons */
         .btn { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
         .btn-withdraw { background: var(--secondary); margin-top: 15px; }
         input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; text-align: center; }
         .info-sub { font-size: 12px; color: #7f8c8d; margin-top: -5px; margin-bottom: 10px; }
 
-        /* Modals / Popups */
+        /* Modals */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
         .modal-content { background: var(--card-bg); padding: 25px; border-radius: 15px; width: 100%; max-width: 400px; text-align: center; position: relative; }
         .close-btn { position: absolute; top: 12px; right: 15px; font-size: 22px; cursor: pointer; color: #95a5a6; }
@@ -57,11 +56,11 @@
     <div id="loginScreen" class="auth-container">
         <div class="auth-card">
             <h2>🪙 TaskEarn लॉगिन</h2>
-            <p style="color: #7f8c8d; margin-bottom: 15px;">पैसे कमाने के लिए अकाउंट में लॉगिन करें</p>
+            <p style="color: #7f8c8d; margin-bottom: 15px;">पैसे कमाने के लिए लॉगिन करें</p>
             <input type="email" id="loginEmail" placeholder="अपना ईमेल दर्ज करें">
             <input type="password" id="loginPassword" placeholder="अपना पासवर्ड दर्ज करें">
             <button class="btn" onclick="handleLogin()">लॉगिन करें</button>
-            <p class="auth-toggle" onclick="showScreen('signUpScreen')">नया अकाउंट बनाएं (Sign Up)</p>
+            <div class="auth-toggle" onclick="showSignUp()">नया अकाउंट बनाएं (Sign Up)</div>
         </div>
     </div>
 
@@ -74,7 +73,7 @@
             <input type="email" id="signUpEmail" placeholder="ईमेल आईडी दर्ज करें">
             <input type="password" id="signUpPassword" placeholder="एक मजबूत पासवर्ड बनाएं">
             <button class="btn" onclick="handleSignUp()">अकाउंट बनाएं</button>
-            <p class="auth-toggle" onclick="showScreen('loginScreen')">पहले से अकाउंट है? लॉगिन करें</p>
+            <div class="auth-toggle" onclick="showLogin()">पहले से अकाउंट है? लॉगिन करें</div>
         </div>
     </div>
 
@@ -90,7 +89,7 @@
 
         <div class="container">
             <div class="card">
-                <h3 style="font-weight: normal;">नमस्ते, <span id="welcomeName" style="color: var(--secondary); font-weight: bold;">यूज़र</span>! 👋</h3>
+                <h3>नमस्ते, <span id="welcomeName" style="color: var(--secondary);">यूज़र</span>! 👋</h3>
                 <h2 style="margin-top: 15px;">टोटल बैलेंस</h2>
                 <h1 style="color: var(--primary); font-size: 36px; margin: 5px 0;">🪙 <span id="mainCoins">0</span></h1>
                 <p class="info-sub">(1000 कॉइन्स = ₹10 रियल कैश)</p>
@@ -101,7 +100,7 @@
 
             <div class="card task-card" onclick="openModal('spinModal')">
                 <div class="task-info">
-                    <h3>🎡 लकी स्पिन (Lucky Spin)</h3>
+                    <h3>🎡 ลकी स्पिन (Lucky Spin)</h3>
                     <p>पहिया घुमाएं और जैकपॉट जीतें</p>
                 </div>
                 <div class="reward-tag">Up to 50</div>
@@ -133,7 +132,7 @@
         </div>
     </div>
 
-    <!-- POPUP MODALS (SPIN, QUIZ, SCRATCH, WITHDRAW) -->
+    <!-- POPUP MODALS -->
     <div id="spinModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('spinModal')">&times;</span>
@@ -179,3 +178,11 @@
         </div>
     </div>
 
+    <script>
+        let coins = 0;
+        let correctAnswer = 0;
+        const MY_AD_LINK = ""; 
+
+        // स्क्रीन स्विच करने के सरल फंक्शन
+        function showSignUp() {
+            document.getElementById('loginScreen').style.display = 'none';
